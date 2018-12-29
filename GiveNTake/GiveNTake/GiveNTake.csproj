@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Models\DTOs\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>

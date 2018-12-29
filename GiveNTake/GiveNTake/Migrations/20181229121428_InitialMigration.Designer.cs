@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GiveNTake.Migrations
 {
     [DbContext(typeof(GiveNTakeContext))]
-    [Migration("20181225173850_InitialMigration")]
+    [Migration("20181229121428_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,8 @@ namespace GiveNTake.Migrations
                     b.Property<int>("CityId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name");
 
                     b.HasKey("CityId");
 
