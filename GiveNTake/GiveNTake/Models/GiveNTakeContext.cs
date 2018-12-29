@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiveNTake.Models {
@@ -25,6 +27,26 @@ namespace GiveNTake.Models {
                 .IsRequired();
         }
 
+        public void SeedData() {
+            if (!Categories.Any()) {
+                var appliances = new Category() {
+                    Name = "Appliances",
+                    Subcategories = new List<Category>() {
+                        new Category(){Name = "Microwaves"}
+                    }
+                };
+                Categories.Add(appliances);
 
+                SaveChanges();
+            }
+
+            if (!Cities.Any()) {
+                Cities.AddRange(
+                    new City { Name = "New York" },
+                    new City { Name = "Seattle" },
+                    new City { Name = "San Francisco" });
+                SaveChanges();
+            }
+        }
     }
 }

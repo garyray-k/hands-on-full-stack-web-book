@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GiveNTake.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,21 @@ using Microsoft.EntityFrameworkCore;
 namespace GiveNTake.Controllers {
     [Route("api/[controller]")]
     public class ProductsController : Controller {
-        private DbContext _context;
+        private GiveNTakeContext _context;
+        private static readonly IMapper _productsMapper;
+
+        static ProductsController() {
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<Product, ProductDTO>()
+                    .ForMember(dto => dto.City, opt => opt.MapFrom(product => product.City))
+                    .ForMember(dto => dto.Category, opt => opt.MapFrom(product => product.Category.ParentCategory.Name))
+                    .ForMember(dto => dto.Subcategory, opt => opt.MapFrom(product => product.Category.Name));
+
+                cfg.CreateMap<City, CityDTO>()
+                    .ForMember(dto => dto.CityId, opt => opt.MapFrom(city => city.CityId));
+            });
+            _productsMapper = config.CreateMapper();
+        }
 
         public ProductsController(GiveNTakeContext context) {
             _context = context;
@@ -19,19 +34,26 @@ namespace GiveNTake.Controllers {
 
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get() {
+        public IEnumerable<string> GetProduct() {
             return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id) {
-            return "value";
+        [HttpGet("{id}", Name = nameof(GetProduct))]
+        public async Task<ActionResult<ProductDTO>> GetProduct(int id) {
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .ThenInclude(c => c.ParentCategory)
+                .SingleOrDefaultAsync(p => p.ProductId == id);
+            if (product == null) {
+                return NotFound();
+            }
+            return Ok(_productsMapper.Map<ProductDTO>(product));
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value) {
+        public void AddNewProduct([FromBody]NewProductDTO newProduct) {
         }
 
         // PUT api/values/5

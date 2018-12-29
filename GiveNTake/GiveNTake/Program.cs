@@ -20,6 +20,7 @@ namespace GiveNTake {
                 var context = services.GetService<GiveNTakeContext>();
                 try {
                     context.Database.Migrate();
+                    context.SeedData();
                 }
                 catch (Exception ex) {
                     throw ex;
